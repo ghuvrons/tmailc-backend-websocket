@@ -12,7 +12,7 @@ class PDFRetrieval:
         self.Database = mongo_db
         self.document_category = {
             #parameter : (basepath on file, on mongo)
-            "Annual Report": ("C:\\Users\\Asus\\Projects\\CPEBR", "annual_report", ),
+            "Annual Report": ("/var/database/AR", "annual_report", ),
             "Sustainability Report": ("/var/database/Sustainability Report", "sustainability_report", ),
             "MDnA.Indonesia": ("/var/database/MDnA", "MDnA.id", ),
             "MDnA.English": ("/var/database/MDnA", "MDnA.en", )
