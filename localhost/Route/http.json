@@ -1,0 +1,10 @@
+[
+    {
+        "url":"/",
+        "middleware" : ["header/contentType/appJSON@run"],
+        "group":[
+            {"url": "/", "controller" : "site/site@index", "respond": false},
+            {"url": "sic_code" , "controller" : "searchEngine/searchEngine@listSIC"}
+        ]
+    }
+]

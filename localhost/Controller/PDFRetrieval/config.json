@@ -1,0 +1,21 @@
+{
+    "document_category": {
+        "Annual Report": {
+            "basePath": "/var/database/AR", 
+            "mongoCategory":"annual_report"
+        },
+        "Sustainability Report": {
+            "basePath": "/var/database/Sustainability Report", 
+            "mongoCategory":"sustainability_report"
+        },
+        "MDnA.Indonesia": {
+            "basePath": "/var/database/MDnA", 
+            "mongoCategory":"MDnA.id"
+        },
+        "MDnA.English": {
+            "basePath": "/var/database/MDnA", 
+            "mongoCategory":"MDnA.en"
+        }
+    },
+    "excel_download_base_path": "/var/www/tmailc/xlxs/"
+}
