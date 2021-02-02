@@ -3,8 +3,15 @@
         "url":"/",
         "middleware" : ["header/contentType/appJSON@run"],
         "group":[
-            {"url": "/", "controller" : "site/site@index", "respond": false},
-            {"url": "sic_code" , "controller" : "searchEngine/searchEngine@listSIC"}
+            {"url": "/", "controller" : "site/site@index"},
+            {"url": "sic_code" , "controller" : "searchEngine/searchEngine@listSIC"},
+            {"url": "pdf_data" , 
+                "group" : [
+                    {"url": "/list", "controller" : "pdfData/pdfData@getList"},
+                    {"url": "/update", "controller" : "pdfData/pdfData@update"},
+                    {"url": "/{id}", "controller" : "pdfData/pdfData@detail"}
+                ]
+            }
         ]
     }
 ]

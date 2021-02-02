@@ -175,26 +175,15 @@ class PDFRetrieval:
                     break
                 info[key] = val
         return info
-    def uploadPDF(self, pdfPath, ticker, year, txtDir = None, isForceReplace=False, category='Annual Report'):
+    
+    def uploadPDF(self, ticker, year, pdfPath, category='Annual Report', sic = None, isForceReplace=False):
         data = {}
-        pdfFilename = pdfPath
         isExists = False
         isText = False
         if pdfPath.split(".")[-1] in ["txt", "TXT"]:
             isText = True
-        if txtDir:
-            txtFilename = txtDir + pdfPath.split("/")[-1] + ".txt"
-        else:
-            txtFilename = '/txt/'+str(year)+'/'+pdfPath.split("/")[-1]+ ".txt"
-        if category[:4] == 'MD&A':
-            lang = category.split('.')[-1]
-            txtFilename = "/"+lang+txtFilename
+        
         data["_id"] = ticker+str(year)
-        data["path"] = {self.document_category[category][1]: {}}
-        if not isText:
-            data["path"][self.document_category[category][1]]["pdf"] = pdfFilename
-        data["ticker"] = ticker
-        data["year"] = year
         
         mypdf = self.Database['pdf_report'].find_one({'_id': data['_id']}, {"path."+self.document_category[category][1]: 1})
         
@@ -202,17 +191,15 @@ class PDFRetrieval:
           and 'path' in mypdf 
           and self.document_category[category][1] in mypdf['path'] 
           and 'path' in mypdf['path'][self.document_category[category][1]]):
-            if isText:
-                pass
+            if isForceReplace:
+                isExists = True
             elif mypdf['path'][self.document_category[category][1]]['pdf'] == pdfPath:
                 return
-            elif isForceReplace:
-                isExists = True
             else:
                 self.log("double ticker", 
-                    data["path"][self.document_category[category][1]]['pdf'], 
-                    data["ticker"], 
-                    data["year"], mypdf["path"][self.document_category[category][1]]['pdf'],
+                    pdfPath, 
+                    ticker, 
+                    year, mypdf["path"][self.document_category[category][1]]['pdf'],
                     description=category
                 )
                 return
@@ -222,45 +209,21 @@ class PDFRetrieval:
         # apt-get install poppler-utils
         
         self.onConverting(pdfPath.split("/")[-1])
-        
-        pdfjson = []
-        if not isText:
-            info = self.pdfInfo(self.document_category[category][0] + pdfFilename)
-            if 'Pages' in info:
-                for i in range(int(info['Pages'])):
-                    p = str(i+1)
-                    p1 = subprocess.Popen(['pdftotext', '-f', p, '-l', p, self.document_category[category][0] + pdfFilename, 'tmp'], stdout=subprocess.PIPE)
-                    output = p1.communicate()[0]
-                    sys.stdout.write('-')
-                    sys.stdout.write(output)
-                    sys.stdout.flush()
-                    p1 = subprocess.Popen(['cat', 'tmp'], stdout=subprocess.PIPE)
-                    output = p1.communicate()[0]
-                    pdfjson.append(self.txtNormalisasi(output))
-            else:
-                self.log("cannot read pdf file", data["path"][self.document_category[category][1]]['pdf'], data["ticker"], data["year"], description=category)
-        else:
-            baseTextFile = open(self.document_category[category][0] + pdfFilename, "r") #make text file
-            try:
-                pdfjson = [unicode(baseTextFile.read(), "utf-8")]
-            except:
-                self.log("cannot read text file", pdfFilename, data["ticker"], data["year"], description=category)
-            baseTextFile.close()
-        txtDir_tmp = self.document_category[category][0]
-        for part_of_path in txtFilename.split('/')[:-1]:
-            if part_of_path == '': continue
-            txtDir_tmp += '/'+part_of_path
-            if not os.path.exists(txtDir_tmp):
-                os.mkdir(txtDir_tmp)
-        textFile = open(self.document_category[category][0] + txtFilename, "w") #make text file
-        textFile.write(json.dumps(pdfjson)) #write text to text file
-        textFile.close()
-        data["path"][self.document_category[category][1]]['txt'] = txtFilename
+        txtFilename = self.pdfToTxt(ticker, year, pdfPath, category)
+        if sic is not None:
+            data["sic"] = ticker
+        data["ticker"] = ticker
+        data["year"] = year
+        data["path"] = {
+            self.document_category[category][1]: {
+                "pdf": pdfPath,
+                "txt": txtFilename
+        }}
+
         if isExists:
             newData = {}
             newData["path."+self.document_category[category][1]+".txt"] = txtFilename
-            if not isText:
-                newData["path."+self.document_category[category][1]+".pdf"] = pdfFilename
+            newData["path."+self.document_category[category][1]+".pdf"] = pdfFilename
             self.Database['pdf_report'].update({"_id":data["_id"]},
                 {"$set":newData}
             )
@@ -273,10 +236,59 @@ class PDFRetrieval:
                     tmp_ob[p_o] = {}
                     tmp_ob = tmp_ob[p_o]
                 if not isText:                    
-                    tmp_ob["pdf"] = pdfFilename
+                    tmp_ob["pdf"] = pdfPath
                 tmp_ob["txt"] = txtFilename
             self.Database['pdf_report'].save(data)
+    
+    def pdfToTxt(self, ticker, year, pdfFilename, category):
+        base_path = self.document_category[category][0]
+        info = self.pdfInfo(base_path + pdfFilename)
 
+        isText = False
+        if pdfFilename.split(".")[-1] in ["txt", "TXT"]:
+            isText = True
+
+        txtFilename = '/txt/'+str(year)+'/'+pdfFilename.split("/")[-1]+ ".txt"
+        if category[:4] == 'MDnA':
+            lang = category.split('.')[-1]
+            txtFilename = "/"+lang+txtFilename
+
+        pdfjson = []
+        if not isText:
+            info = self.pdfInfo(base_path + pdfFilename)
+            if 'Pages' in info:
+                for i in range(int(info['Pages'])):
+                    p = str(i+1)
+                    p1 = subprocess.Popen(['pdftotext', '-f', p, '-l', p, base_path + pdfFilename, 'tmp'], stdout=subprocess.PIPE)
+                    output = p1.communicate()[0]
+                    # sys.stdout.write('-')
+                    # sys.stdout.write(output)
+                    # sys.stdout.flush()
+                    p1 = subprocess.Popen(['cat', 'tmp'], stdout=subprocess.PIPE)
+                    output = p1.communicate()[0]
+                    pdfjson.append(self.txtNormalisasi(output))
+            else:
+                self.log("cannot read pdf file", pdfFilename, ticker, year, description=category)
+        else:
+            baseTextFile = open(base_path + pdfFilename, "r") #make text file
+            try:
+                pdfjson = [unicode(baseTextFile.read(), "utf-8")]
+            except:
+                self.log("cannot read text file", pdfFilename, ticker, year, description=category)
+            baseTextFile.close()
+        
+        for part_of_path in txtFilename.split('/')[:-1]:
+            if part_of_path == '': continue
+            txtDir_tmp += '/'+part_of_path
+            if not os.path.exists(txtDir_tmp):
+                os.mkdir(txtDir_tmp)
+        
+        textFile = open(base_path + txtFilename, "w") #make text file
+        textFile.write(json.dumps(pdfjson)) #write text to text file
+        textFile.close()
+
+        return txtFilename
+    
     def txtNormalisasi(self, text):
         def repl(m):
             text = m.group(1)

@@ -1,3 +1,5 @@
+from json import JSONEncoder
+
 class MyEncoder(JSONEncoder):
     def default(self, obj_pdf_data):
         return obj_pdf_data.dict_data
@@ -17,19 +19,30 @@ class PDFData:
         pass
 
     @staticmethod
+    def find_one(_id):
+        pdf = PDFData.mongo_collect.find_one(_id)
+        if pdf:
+            return PDFData(_id, pdf)
+        else: return None
+
+    @staticmethod
     def find(**arg):
-        _condition = PDFData.default_condition(arg)
+        _condition = PDFData.default_condition(**arg)
         cur = PDFData.mongo_collect.find(_condition)
         paging = {
             'page' : None,
             'limit': 20
         }
         paging.update(arg)
+        count = cur.count()
         if paging['page'] is not None:
-            _skip = (paging['page'] - 1)*limit
+            _skip = (paging['page'] - 1)*paging['limit']
             cur.skip(_skip).limit(paging['limit'])
-        result = [PDFData(d._id, _d) for d in cur]
-        return result
+        result = [PDFData(d['_id'], d) for d in cur]
+        return {
+            "count" : count,
+            "data" : result
+        }
     
     @staticmethod
     def default_condition(**arg):
@@ -67,7 +80,7 @@ class PDFData:
             if len(_sic) > 0:
                 _condition["sic"] = { "$in": _sic}
 
-        if data['part_tag']:
+        if data['path_tag']:
             _condition["path."+data['path_tag']] = {"$exists": True}
 
         return _condition
