@@ -31,8 +31,9 @@ class pdfData(Controller):
         sic = int(req.data.getvalue("sic"))
         category = req.data.getvalue("category")
         ext = req.data["pdf"].filename.split(".")[-1]
-        pdfPath = "/pdf/{}/{}_{}.{}".format(year, category, ticker, ext)
-        self.saveFile(req.data["pdf"].file, base_path = ".", path="pdfPath")
+        base_path = self.pdfRetrieval.document_category[category][0]
+        pdfPath = "/pdf/{}/{}_{}_{}.{}".format(year, ticker, category, year, ext)
+        self.saveFile(req.data["pdf"].file, base_path = base_path, path=pdfPath)
         self.pdfRetrieval.uploadPDF(ticker, year, pdfPath, category, sic)
         return _id
     
@@ -47,8 +48,9 @@ class pdfData(Controller):
         else:
             raise HTTPError(404, 'not found')
         ext = req.data["pdf"].filename.split(".")[-1]
-        pdfPath = "/pdf/{}/{}_{}.{}".format(year, category, ticker, ext)
-        self.saveFile(req.data["pdf"].file, base_path = ".", path="pdfPath")
+        base_path = self.pdfRetrieval.document_category[category][0]
+        pdfPath = "/pdf/{}/{}_{}_{}.{}".format(year, ticker, category, year, ext)
+        self.saveFile(req.data["pdf"].file, base_path = base_path, path=pdfPath)
         self.pdfRetrieval.uploadPDF(ticker, year, pdfPath, category)
         return "ok"
 
