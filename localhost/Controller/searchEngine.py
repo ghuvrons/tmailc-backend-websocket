@@ -20,7 +20,7 @@ class searchEngine(Controller):
     def retrieve(self, requestHeandler):
         def progress(p):
             requestHeandler.ws.sendRespond("retrieve_loading", 200, p)
-        data = self.pdfRetrieval.retrieve(requestHeandler.message, callback=progress)
+        data = self.pdfRetrieval.retrieve(requestHeandler.data, callback=progress)
         l_data = len(data)
         i = 0
         while i < l_data:
@@ -31,8 +31,8 @@ class searchEngine(Controller):
     def exportExcel(self, requestHeandler):
         def progress(p):
             requestHeandler.ws.sendRespond("retrieve_loading", 200, p)
-        data = self.pdfRetrieval.exportExcel(requestHeandler.message, callback=progress)
+        data = self.pdfRetrieval.exportExcel(requestHeandler.data, callback=progress)
         return self.urlExcel+'/'+data
 
     def excelFile(self, requestHeandler):
-        self.Services['deleteTempFile'].delete(ExportExcel.directory + requestHeandler.message)
+        self.Services['deleteTempFile'].delete(ExportExcel.directory + requestHeandler.data)

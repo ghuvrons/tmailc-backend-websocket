@@ -21,7 +21,7 @@ class pdfData(Controller):
         }
     
     def detail(self, req):
-        _id = req.data['id']
+        _id = req.parameter['id']
         pdf = PDFData.find_one(_id)
         return pdf.dict_data if pdf else None
 

@@ -14,6 +14,7 @@ class PDFRetrieval:
             #parameter : (basepath on file, on mongo)
             "Annual Report": ("/var/database/AR", "annual_report", ),
             "Sustainability Report": ("/var/database/Sustainability Report", "sustainability_report", ),
+            "PDO": ("/var/database/PDO", "pdo", ),
             "MDnA.Indonesia": ("/var/database/MDnA", "MDnA.id", ),
             "MDnA.English": ("/var/database/MDnA", "MDnA.en", )
         }
@@ -157,7 +158,27 @@ class PDFRetrieval:
             r_tmp["pdfPath"] = pdfPath
             result.append(r_tmp)
         return result
-    
+    def multiplePdfToTxt(self, category, years = [], log_callback = None):
+        basePath = PDFRetrieval.basePath[category][0]+'/pdf'
+        dirs = os.listdir( basePath )
+        # This would print all the files and directories
+        for thn in years:
+            if os.path.isdir(basePath+'/'+thn):
+                pdf_paths = os.listdir(basePath+'/'+thn)
+                for pdf_path in pdf_paths:
+                    ext = pdf_path.split(".")[-1]:
+                    if ext not in ['pdf', 'PDF']: continue
+                    tmpRe = re.search("[A-Z]{4}", pdf_path)
+                    pdf_path = "/pdf/"+thn+'/'+pdf_path
+                    self.log("Reading file {}".format(pdf_path))
+                    if tmpRe:
+                        ticker = tmpRe.group()
+                        self.log("\tTicker :{}".format(ticker))
+                        self.log("\tYear :{}".format(thn))
+                        self.log("\tCategory :{}".format(category))
+                        self.uploadPDF(ticker, int(thn), pdf_path, category = category)
+                    else:
+                        self.log("\tTicker not found for file")
     def onConverting(self, pdfPath):
         print("converting ", pdfPath)
     def pdfInfo(self, pdf):
@@ -165,7 +186,7 @@ class PDFRetrieval:
         p1 = subprocess.Popen(['pdfinfo', pdf], stdout=subprocess.PIPE)
         output = p1.communicate()[0]
         info = {}
-        for d in output.split("\n"):
+        for d in output.decode('UTF-8').split("\n"):
             if not d.find(":") == -1:
                 key, val = d.split(":", 1)
                 while len(val) > 0:
@@ -196,12 +217,7 @@ class PDFRetrieval:
             elif mypdf['path'][self.document_category[category][1]]['pdf'] == pdfPath:
                 return
             else:
-                self.log("double ticker", 
-                    pdfPath, 
-                    ticker, 
-                    year, mypdf["path"][self.document_category[category][1]]['pdf'],
-                    description=category
-                )
+                self.log("\tDatabase is exist. <skip>")
                 return
         elif mypdf:
             isExists = True
@@ -209,7 +225,10 @@ class PDFRetrieval:
         # apt-get install poppler-utils
         
         self.onConverting(pdfPath.split("/")[-1])
+        
+        self.log("\tConverting...")
         txtFilename = self.pdfToTxt(ticker, year, pdfPath, category)
+        if txtFilename is None: return
         if sic is not None:
             data["sic"] = ticker
         data["ticker"] = ticker
@@ -239,6 +258,7 @@ class PDFRetrieval:
                     tmp_ob["pdf"] = pdfPath
                 tmp_ob["txt"] = txtFilename
             self.Database['pdf_report'].save(data)
+        self.log("\tDone.")
     
     def pdfToTxt(self, ticker, year, pdfFilename, category):
         base_path = self.document_category[category][0]
@@ -266,15 +286,18 @@ class PDFRetrieval:
                     # sys.stdout.flush()
                     p1 = subprocess.Popen(['cat', 'tmp'], stdout=subprocess.PIPE)
                     output = p1.communicate()[0]
-                    pdfjson.append(self.txtNormalisasi(output))
+                    pdfjson.append(self.txtNormalisasi(output.decode('UTF-8')))
             else:
-                self.log("cannot read pdf file", pdfFilename, ticker, year, description=category)
+                self.log("\tcannot read pdf file")
+                return None
         else:
             baseTextFile = open(base_path + pdfFilename, "r") #make text file
             try:
                 pdfjson = [unicode(baseTextFile.read(), "utf-8")]
             except:
-                self.log("cannot read text file", pdfFilename, ticker, year, description=category)
+                baseTextFile.close()
+                self.log("\tcannot read text file")
+                return None
             baseTextFile.close()
         
         for part_of_path in txtFilename.split('/')[:-1]:
