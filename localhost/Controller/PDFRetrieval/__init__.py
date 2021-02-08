@@ -166,7 +166,7 @@ class PDFRetrieval:
             if os.path.isdir(basePath+'/'+thn):
                 pdf_paths = os.listdir(basePath+'/'+thn)
                 for pdf_path in pdf_paths:
-                    ext = pdf_path.split(".")[-1]:
+                    ext = pdf_path.split(".")[-1]
                     if ext not in ['pdf', 'PDF']: continue
                     tmpRe = re.search("[A-Z]{4}", pdf_path)
                     pdf_path = "/pdf/"+thn+'/'+pdf_path
