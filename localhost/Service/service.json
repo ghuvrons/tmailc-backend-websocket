@@ -1,3 +1,4 @@
 {
-  "deleteTempFile": "DeleteTempFile.DeleteTempFile"
+  "deleteTempFile": "DeleteTempFile.DeleteTempFile",
+  "gDriveApi" : "GDriveApi.GDriveApi"
 }
