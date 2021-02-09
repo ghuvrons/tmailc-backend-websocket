@@ -15,8 +15,9 @@ class PdfTxtConverter(Service):
 
     def stopConverting(self):
         self.pdfRetrieval.isConverterStop = True
+        self.pdfRetrieval.log("Terminating....")
         return True
-        
+
     def on_convert(self, data):
         self.Log.info("converting {}".format(data))
         category = data['category']
