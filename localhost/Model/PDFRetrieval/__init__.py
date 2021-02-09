@@ -180,6 +180,8 @@ class PDFRetrieval:
                             self.uploadPDF(ticker, int(thn), pdf_path, category = category)
                         else:
                             self.log("\tTicker not found for file")
+                else:
+                    self.log("Dir not found: "+basePath+'/'+thn)
         except Exception:
             e = traceback.format_exc()
             self.log(e)
