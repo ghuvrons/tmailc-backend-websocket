@@ -320,7 +320,7 @@ class PDFRetrieval:
     def txtNormalisasi(self, text):
         def repl(m):
             text = m.group(1)
-            if text > 1:
+            if text is not None:
                 isNotStart = re.search(r'^[A-z0-9&][A-z0-9\s]', text)
                 isEnd = re.search(r'[^A-z0-9,)]$', text)
                 if isNotStart:
