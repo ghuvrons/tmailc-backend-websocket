@@ -1,4 +1,5 @@
 {
   "deleteTempFile": "DeleteTempFile.DeleteTempFile",
-  "gDriveApi" : "GDriveApi.GDriveApi"
+  "gDriveApi" : "GDriveApi.GDriveApi",
+  "pdTTxtConverter" : "PdfTxtConverter.PdfTxtConverter"
 }

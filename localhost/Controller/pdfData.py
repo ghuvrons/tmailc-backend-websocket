@@ -7,8 +7,8 @@ from PySan.ErrorHandler import HTTPError
 
 class pdfData(Controller):
     def _init_(self):
-        self.pdfRetrieval = PDFRetrieval(self.Databases['db2']['companies_data'])
-        PDFData.mongo_collect = self.Databases['db2']['companies_data']['pdf_report']
+        self.pdfRetrieval = self.Models['pdfRetrieval']()
+        PDFData.mongo_collect = self.pdfRetrieval.Database_mongo
 
     def getList(self, req):
         page = 1
@@ -62,3 +62,9 @@ class pdfData(Controller):
             b = _f.read(2048)
         _f_save.close()
         return
+
+    def join_log_converter(self, req):
+        self.Services['pdTTxtConverter'].addStreamer(req)
+    
+    def convertMultiplePdf(self, req):
+        return self.Services['pdTTxtConverter'].emit("convert", req.data)

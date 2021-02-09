@@ -6,7 +6,8 @@
             {"url": "/", "controller" : "site/site@index"},
             {"url": "retrieve_words" , "controller" : "searchEngine/searchEngine@retrieve"},
             {"url": "export_excel" , "controller" : "searchEngine/searchEngine@exportExcel"},
-            {"url": "gdrivecopy" , "controller" : "site/site@copy"}
+            {"url": "gdrivecopy" , "controller" : "site/site@copy"},
+            {"url": "join_log_converter" , "controller" : "pdfData/pdfData@join_log_converter"}
         ]
     }
 ]

@@ -1,0 +1,12 @@
+[
+    {"code": 0, "name": "Agriculture, Forestry, and Fishing"},
+    {"code": 1, "name": "Mining"},
+    {"code": 2, "name": "Construction Industries"},
+    {"code": 3, "name": "Manufacturing"},
+    {"code": 4, "name": "Transportation, Communication and Utilities"},
+    {"code": 5, "name": "Finance and insurance industry"},
+    {"code": 6, "name": "Wholesale and Retail Trade"},
+    {"code": 7, "name": "Services Industries"},
+    {"code": 8, "name": "Health, Legal and Educational Services and Consulting"},
+    {"code": 9, "name": "Public Administration"}
+]

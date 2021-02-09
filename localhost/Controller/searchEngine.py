@@ -8,9 +8,9 @@ from .PDFRetrieval import ExportExcel
 class searchEngine(Controller):
     def _init_(self):
         self.urlExcel = '/excel'
-        self.pdfRetrieval = PDFRetrieval(self.Databases['db2']['companies_data'])
+        self.pdfRetrieval = self.Models['pdfRetrieval']()
         ExportExcel.directory = self.appPath+'/Public'+self.urlExcel
-    
+
     def listSIC(self):
         return {
             "status": 200,
