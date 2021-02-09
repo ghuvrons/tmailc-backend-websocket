@@ -304,7 +304,7 @@ class PDFRetrieval:
                 self.log("\tcannot read text file")
                 return None
             baseTextFile.close()
-        
+        txtDir_tmp = base_path
         for part_of_path in txtFilename.split('/')[:-1]:
             if part_of_path == '': continue
             txtDir_tmp += '/'+part_of_path
