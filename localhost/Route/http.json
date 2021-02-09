@@ -10,6 +10,7 @@
                     {"url": "/list", "controller" : "pdfData/pdfData@getList"},
                     {"url": "/update", "controller" : "pdfData/pdfData@update"},
                     {"url": "/convert_multiple", "controller" : "pdfData/pdfData@convertMultiplePdf"},
+                    {"url": "/convert_stop", "controller" : "pdfData/pdfData@stopConverting"},
                     {"url": "/{id}", "controller" : "pdfData/pdfData@detail"}
                 ]
             }

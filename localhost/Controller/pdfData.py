@@ -68,3 +68,6 @@ class pdfData(Controller):
     
     def convertMultiplePdf(self, req):
         return self.Services['pdTTxtConverter'].emit("convert", req.data)
+        
+    def stopConverting(self, req):
+        return self.Services['pdTTxtConverter'].stopConverting()

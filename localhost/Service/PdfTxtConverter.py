@@ -9,8 +9,14 @@ class PdfTxtConverter(Service):
         self.timeout = None
         self.pdfRetrieval = self.Models['pdfRetrieval']()
         self.pdfRetrieval.log = self.r_log
+
     def r_log(self, msg):
         self.broadcast("pdf_txt_converter", msg)
+
+    def stopConverting(self):
+        self.pdfRetrieval.isConverterStop = True
+        return True
+        
     def on_convert(self, data):
         self.Log.info("converting {}".format(data))
         category = data['category']

@@ -30,6 +30,7 @@ class PDFRetrieval:
         sic_code = open(__path__[0]+'/sic_code.json')
         self.sic_code = json.load(sic_code)
         sic_code.close()
+        self.isConverterStop = True
 
     def log(self, msg):
         pass
@@ -162,11 +163,14 @@ class PDFRetrieval:
         dirs = os.listdir( basePath )
         # This would print all the files and directories
         try:
+            self.isConverterStop = False
             for thn in years:
+                if self.isConverterStop: break
                 thn = str(thn)
                 if os.path.isdir(basePath+'/'+thn):
                     pdf_paths = os.listdir(basePath+'/'+thn)
                     for pdf_path in pdf_paths:
+                        if self.isConverterStop: break
                         ext = pdf_path.split(".")[-1]
                         if ext not in ['pdf', 'PDF']: continue
                         tmpRe = re.search("[A-Z]{4}", pdf_path)
@@ -182,9 +186,12 @@ class PDFRetrieval:
                             self.log("\tTicker not found for file")
                 else:
                     self.log("Dir not found: "+basePath+'/'+thn)
+                if self.isConverterStop: self.log("Force stoped!")
         except Exception:
             e = traceback.format_exc()
             self.log(e)
+        finally:
+            self.isConverterStop = True
 
     def onConverting(self, pdfPath):
         print("converting ", pdfPath)
