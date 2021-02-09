@@ -246,7 +246,7 @@ class PDFRetrieval:
         if isExists:
             newData = {}
             newData["path."+self.document_category[category][1]+".txt"] = txtFilename
-            newData["path."+self.document_category[category][1]+".pdf"] = pdfFilename
+            newData["path."+self.document_category[category][1]+".pdf"] = pdfPath
             self.Database_mongo['pdf_report'].update({"_id":data["_id"]},
                 {"$set":newData}
             )
