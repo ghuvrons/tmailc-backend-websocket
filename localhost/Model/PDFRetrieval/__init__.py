@@ -187,7 +187,6 @@ class PDFRetrieval:
     def onConverting(self, pdfPath):
         print("converting ", pdfPath)
     def pdfInfo(self, pdf):
-        print(pdf)
         p1 = subprocess.Popen(['pdfinfo', pdf], stdout=subprocess.PIPE)
         output = p1.communicate()[0]
         info = {}
