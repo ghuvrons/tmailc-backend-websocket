@@ -16,7 +16,7 @@ class PdfTxtConverter(Service):
         category = data['category']
         years = data['years']
         try:
-            self.pdfRetrieval.multiplePdfToTxt("Annual Report", [2011])
+            self.pdfRetrieval.multiplePdfToTxt(category, years)
         except Exception:
             e = traceback.format_exc()
             self.r_log(e)
