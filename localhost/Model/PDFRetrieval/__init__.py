@@ -4,6 +4,7 @@ import subprocess
 import re
 import os, sys
 import json, csv
+import traceback
 from time import sleep
 
 class PDFRetrieval:
@@ -162,6 +163,7 @@ class PDFRetrieval:
         # This would print all the files and directories
         try:
             for thn in years:
+                thn = str(thn)
                 if os.path.isdir(basePath+'/'+thn):
                     pdf_paths = os.listdir(basePath+'/'+thn)
                     for pdf_path in pdf_paths:
